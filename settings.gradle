@@ -1,0 +1,4 @@
+include ':mscV5PlusDemo'
+//include ':moudle_speech'
+include ':app'
+rootProject.name = "SpeechHelper"
