@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
     private void initSpeech() {
         //初始化 语音识别、语音播放
         getLifecycle().addObserver(SpeechHelper.getInstance());
-        SpeechHelper.getInstance().initInMainProcess(this, "5ff31405");
+        SpeechHelper.getInstance().initInMainProcess(this, "601663eb");
         SpeechHelper.getInstance().requestPermission(this);
         SpeechHelper.getInstance().prepare(this, new OnSpeechInitListener() {
             @Override
@@ -193,13 +193,14 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
         });
 
         music.setOnClickListener(v -> {
-            if (isSpeaking) {
-                return;
-            }
-            lottie.setAnimation(R.raw.animator_0);
-            lottie.playAnimation();
-            robot_message.setText("你可以说：播放 一首音乐");
-            SpeakHelper.getInstance().startSpeak("你可以说：播放 一首音乐", this);
+            MusicActivity.start(this, null);
+//            if (isSpeaking) {
+//                return;
+//            }
+//            lottie.setAnimation(R.raw.animator_0);
+//            lottie.playAnimation();
+//            robot_message.setText("你可以说：播放 一首音乐");
+//            SpeakHelper.getInstance().startSpeak("你可以说：播放 一首音乐", this);
         });
 
         message.setOnClickListener(v -> {
@@ -227,6 +228,13 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
         SpeechHelper.getInstance().start(new SimpleSpeechListenerImpl() {
             @Override
             public void onResult(String originalText, String text) {
+                if (text.contains("笑话")) {
+                    lottie.setAnimation(R.raw.joke);
+                    lottie.playAnimation();
+                } else {
+                    lottie.setAnimation(R.raw.animator_0);
+                    lottie.playAnimation();
+                }
                 IntentUtils.intent(MainActivity.this, text, MainActivity.this);
             }
 

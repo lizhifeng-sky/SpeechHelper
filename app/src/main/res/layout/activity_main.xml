@@ -45,7 +45,8 @@
             android:layout_marginBottom="10dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:src="@drawable/guide" />
+            android:src="@drawable/guide"
+            android:tint="#fff" />
 
         <ImageView
             android:id="@+id/music"
@@ -55,7 +56,8 @@
             android:layout_marginBottom="10dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:src="@drawable/music" />
+            android:src="@drawable/music"
+            android:tint="#fff" />
 
         <ImageView
             android:id="@+id/message"
@@ -65,7 +67,8 @@
             android:layout_marginBottom="10dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:src="@drawable/message" />
+            android:src="@drawable/message"
+            android:tint="#fff" />
 
         <ImageView
             android:id="@+id/phone"
@@ -75,8 +78,8 @@
             android:layout_marginBottom="10dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:src="@drawable/ic_baseline_phone_24"
-            android:tint="#f00" />
+            android:src="@drawable/icon_phone"
+            android:tint="#fff" />
     </LinearLayout>
 
     <ImageView

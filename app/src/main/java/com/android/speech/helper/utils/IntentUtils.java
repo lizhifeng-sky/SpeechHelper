@@ -3,6 +3,7 @@ package com.android.speech.helper.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.speech.helper.MusicActivity;
 import com.iflytek.OnSpeakListener;
 import com.iflytek.SimpleSpeakListenerImpl;
 import com.iflytek.SpeakHelper;
@@ -34,11 +35,7 @@ public class IntentUtils {
                 public void onCompleted(SpeechError speechError) {
                     super.onCompleted(speechError);
                     String music = MusicUtils.matchMusic(text);
-                    if (music != null) {
-                        MusicUtils.getInstance().play(context, music);
-                    } else {
-                        SpeakHelper.getInstance().startSpeak("小麦没有找到这个音乐呢，你能不能再说一下呢", onSpeakListener);
-                    }
+                    MusicActivity.start(context, music);
                 }
             });
 
@@ -65,7 +62,7 @@ public class IntentUtils {
         } else if (text.contains("笑话")) {
             JokeUtils.speakJoke(onSpeakListener);
         } else {
-            switch ((int) (System.currentTimeMillis()%6)){
+            switch ((int) (System.currentTimeMillis() % 6)) {
                 case 1:
                     SpeakHelper.getInstance().startSpeak("小麦没听懂您的意思呢，你可以说 今天天气怎么样", onSpeakListener);
                     break;

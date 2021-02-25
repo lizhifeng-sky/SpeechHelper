@@ -17,7 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SpeechHelper"
         android:usesCleartextTraffic="true">
-
+        <activity
+            android:name=".MusicActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
         <activity android:name=".WebViewActivity" />
         <activity
             android:name=".MainActivity"
