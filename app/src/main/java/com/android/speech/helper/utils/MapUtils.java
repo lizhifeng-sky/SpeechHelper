@@ -4,11 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.speech.helper.MainActivity;
 import com.android.speech.helper.WebViewActivity;
 import com.android.speech.helper.bean.AddressBean;
 import com.android.speech.helper.bean.LocationBean;
@@ -23,8 +21,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import androidx.core.content.ContextCompat;
 
 /**
  * @author lizhifeng
@@ -150,6 +146,7 @@ public class MapUtils {
                 if (addressStartIndex != null) {
                     Log.e("匹配结果", "匹配到地址   " + addressStartIndex + "   即将进行跳转地图");
                     LocationBean lng = MapUtils.getCoordinate(addressStartIndex);
+                    //打开 地图
                     MapUtils.openMap(context, lng);
                 }
             } catch (IOException e) {

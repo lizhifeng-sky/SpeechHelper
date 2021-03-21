@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.speech.helper.R;
-import com.android.speech.helper.bean.MessageBean;
 
 import java.util.List;
 

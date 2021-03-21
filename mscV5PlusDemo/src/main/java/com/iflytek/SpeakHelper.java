@@ -31,25 +31,17 @@ public class SpeakHelper {
     private static String TAG = SpeakHelper.class.getSimpleName();
     private SpeechSynthesizer mTts;
     private SharedPreferences mSharedPreferences;
-    // 缓冲进度
-    private int mPercentForBuffering = 0;
-    // 播放进度
-    private int mPercentForPlaying = 0;
     // 引擎类型
     private String mEngineType = SpeechConstant.TYPE_CLOUD;
-
-    MemoryFile memFile;
-    public volatile long mTotalSize = 0;
     // 默认发音人
     private String voicer = "xiaoyan";
-
     private Vector<byte[]> container = new Vector<>();
-
     private static volatile SpeakHelper speakHelper;
 
     private SpeakHelper() {
     }
 
+    //DCK double-check 单例模式 实现
     public static SpeakHelper getInstance() {
         if (speakHelper == null) {
             synchronized (SpeechHelper.class) {
@@ -62,8 +54,9 @@ public class SpeakHelper {
     }
 
     public void initSpeak(Context context) {
-        // 初始化合成对象
+
         mSharedPreferences = context.getSharedPreferences(TtsSettings.PREFER_NAME, MODE_PRIVATE);
+        // 初始化合成对象
         mTts = SpeechSynthesizer.createSynthesizer(context, new InitListener() {
             @Override
             public void onInit(int code) {
@@ -80,8 +73,9 @@ public class SpeakHelper {
     }
 
     private OnSpeakListener onSpeakListener;
-    public void startSpeak(String text,OnSpeakListener onSpeakListener) {
-        this.onSpeakListener=onSpeakListener;
+
+    public void startSpeak(String text, OnSpeakListener onSpeakListener) {
+        this.onSpeakListener = onSpeakListener;
         setParam();
         int code = mTts.startSpeaking(text, mTtsListener);
 //			/**
@@ -167,60 +161,25 @@ public class SpeakHelper {
                                      String info) {
             // 合成进度
 //            Log.e("MscSpeechLog_", "percent =" + percent);
-            mPercentForBuffering = percent;
+//            mPercentForBuffering = percent;
 //            showTip(String.format(getString(R.string.tts_toast_format),
 //                    mPercentForBuffering, mPercentForPlaying));
         }
 
         @Override
         public void onSpeakProgress(int percent, int beginPos, int endPos) {
-            // 播放进度
-//            Log.e("MscSpeechLog_", "percent =" + percent);
-            mPercentForPlaying = percent;
-//            showTip(String.format(getString(R.string.tts_toast_format),
-//                    mPercentForBuffering, mPercentForPlaying));
-
-//            SpannableStringBuilder style = new SpannableStringBuilder(texts);
-//            Log.e(TAG, "beginPos = " + beginPos + "  endPos = " + endPos);
-//            style.setSpan(new BackgroundColorSpan(Color.RED), beginPos, endPos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//            ((EditText) findViewById(R.id.tts_text)).setText(style);
         }
 
         @Override
         public void onCompleted(SpeechError error) {
             onSpeakListener.onCompleted(error);
-//            System.out.println("oncompleted");
-//            if (error == null) {
-//                //	showTip("播放完成");
-//                DebugLog.LogD("播放完成," + container.size());
-//                try {
-//                    for (int i = 0; i < container.size(); i++) {
-//                        writeToFile(container.get(i));
-//                    }
-//                } catch (IOException e) {
-//
-//                }
-//                FileUtil.saveFile(memFile, mTotalSize, Environment.getExternalStorageDirectory() + "/1.pcm");
-//
-//
-//            } else if (error != null) {
-//                showTip(error.getPlainDescription(true));
-//            }
         }
 
         @Override
         public void onEvent(int eventType, int arg1, int arg2, Bundle obj) {
-            //	 以下代码用于获取与云端的会话id，当业务出错时将会话id提供给技术支持人员，可用于查询会话日志，定位出错原因
-            //	 若使用本地能力，会话id为null
-            if (SpeechEvent.EVENT_SESSION_ID == eventType) {
-                String sid = obj.getString(SpeechEvent.KEY_EVENT_SESSION_ID);
-//                Log.d(TAG, "session id =" + sid);
-            }
-
             //当设置SpeechConstant.TTS_DATA_NOTIFY为1时，抛出buf数据
             if (SpeechEvent.EVENT_TTS_BUFFER == eventType) {
                 byte[] buf = obj.getByteArray(SpeechEvent.KEY_EVENT_TTS_BUFFER);
-//                Log.e("MscSpeechLog_", "bufis =" + buf.length);
                 container.add(buf);
             }
         }

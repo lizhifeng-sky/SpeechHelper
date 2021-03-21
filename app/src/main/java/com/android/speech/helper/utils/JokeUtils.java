@@ -2,11 +2,11 @@ package com.android.speech.helper.utils;
 
 import com.android.speech.helper.bean.JokeResultBean;
 import com.iflytek.OnSpeakListener;
-import com.iflytek.SimpleSpeakListenerImpl;
 import com.iflytek.SpeakHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,14 +32,29 @@ public class JokeUtils {
             BufferedReader br = null;
             try {
                 if (myURL != null) {
+                    //创建 一个 网络 连接
                     httpsConn = myURL.openConnection();// 不使用代理
                 }
                 if (httpsConn != null) {
-                    insr = new InputStreamReader(httpsConn.getInputStream(), "UTF-8");
+                    // 获取 网络连接 的 输入流
+                    InputStream inputStream = httpsConn.getInputStream();
+
+                    insr = new InputStreamReader(inputStream, "UTF-8");
+                    //读取输入流
                     br = new BufferedReader(insr);
-                    JokeResultBean jokeResultBean = GsonUtils.getGson().fromJson(br.readLine(), JokeResultBean.class);
+
+                    //笑话 请求 的返回体
+                    //获取 输入流 对应 的 string 字符串
+                    String json = br.readLine();
+
+                    //解析 json 字符串  获取 笑话返回体
+                    JokeResultBean jokeResultBean = GsonUtils.getGson().fromJson(json, JokeResultBean.class);
+
                     if (jokeResultBean != null && jokeResultBean.getReason().equals("success")) {
-                        SpeakHelper.getInstance().startSpeak(jokeResultBean.getResult().get(0).getContent(), onSpeakListener);
+                        //获取 笑话的 内容
+                        String content = jokeResultBean.getResult().get(0).getContent();
+
+                        SpeakHelper.getInstance().startSpeak(content, onSpeakListener);
                     } else {
                         SpeakHelper.getInstance().startSpeak("获取数据失败", onSpeakListener);
                     }

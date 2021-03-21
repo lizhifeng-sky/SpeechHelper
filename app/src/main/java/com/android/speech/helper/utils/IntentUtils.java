@@ -14,10 +14,14 @@ import com.iflytek.cloud.SpeechError;
  * @date 2021/1/30 13:01
  */
 public class IntentUtils {
+
+    /**
+     * @param text 识别到的 用户说的话
+     * */
     public static void intent(Context context, String text, OnSpeakListener onSpeakListener) {
         Log.e("识别结果", text);
         if (MapUtils.checkTarget(text) != null) {
-            //主要景点匹配
+            //主要景点 附近的美食 匹配
             SpeakHelper.getInstance().startSpeak("好的，请稍候", onSpeakListener);
             MapUtils.poi(context, MapUtils.checkTarget(text));
         } else if (text.contains("带我去")) {

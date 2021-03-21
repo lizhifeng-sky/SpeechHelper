@@ -26,17 +26,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MusicActivity extends AppCompatActivity {
-    private ImageView comeBack;
+
     private TextView musicName;
 
     private TextView currentTime;
     private TextView totalTime;
-    private SeekBar seekBar;
+    private SeekBar musicPlayProgress;
+
+
+
+    private ImageView comeBack;
 
     private ImageView before;
     private ImageView play;
     private ImageView next;
+
     private ImageView menu;
+
+
 
 
     private List<String> musicList;
@@ -65,19 +72,23 @@ public class MusicActivity extends AppCompatActivity {
 
         currentTime = findViewById(R.id.currentTime);
         totalTime = findViewById(R.id.totalTime);
-        seekBar = findViewById(R.id.seekBar);
+        musicPlayProgress = findViewById(R.id.seekBar);
 
         before = findViewById(R.id.before);
         play = findViewById(R.id.play);
         next = findViewById(R.id.next);
         menu = findViewById(R.id.menu);
 
+        //初始化 数据
         initData();
+        //开始播放
         startPlay();
-        initListener();
+        //设置点击事件
+        setOnClickListener();
     }
 
     private void startPlay() {
+        //key-value
         if (getIntent().getStringExtra("name") == null) {
             currentMusicName = musicList.get((int) (System.currentTimeMillis() % 14));
         } else {
@@ -85,20 +96,25 @@ public class MusicActivity extends AppCompatActivity {
         }
         currentMusicPosition = musicList.indexOf(currentMusicName);
         musicName.setText(currentMusicName);
+
+        //开始 播放
+        //先生命周期
         AudioPlayUtils.getInstance().bindLifeCycle(this,
                 new AudioPlayUtils.SimpleMediaPlayImpl() {
 
                     @Override
                     public void onPrepared(long durationInMilliseconds) {
                         super.onPrepared(durationInMilliseconds);
+                        // 准备完成
                         totalTime.setText(translateTime(AudioPlayUtils.getInstance().getCurrentMusicTotalTime()));
                     }
 
                     @Override
                     public void onPlay(long timeInMilliseconds) {
                         super.onPlay(timeInMilliseconds);
+                        //正在播放
                         play.setImageResource(R.drawable.icon_pause);
-                        seekBar.setProgress((int) (timeInMilliseconds * 1.0f * 100 / AudioPlayUtils.getInstance().getCurrentMusicTotalTime()));
+                        musicPlayProgress.setProgress((int) (timeInMilliseconds * 1.0f * 100 / AudioPlayUtils.getInstance().getCurrentMusicTotalTime()));
                         currentTime.setText(translateTime(timeInMilliseconds));
                     }
 
@@ -138,7 +154,7 @@ public class MusicActivity extends AppCompatActivity {
         musicList.add("龙卷风");
     }
 
-    private void initListener() {
+    private void setOnClickListener() {
         comeBack.setOnClickListener(v -> finish());
 
         before.setOnClickListener(new View.OnClickListener() {
@@ -148,8 +164,9 @@ public class MusicActivity extends AppCompatActivity {
                     Toast.makeText(MusicActivity.this, "前面没有音乐了", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                currentMusicPosition--;
+                currentMusicPosition=currentMusicPosition-1;
                 musicName.setText(musicList.get(currentMusicPosition));
+
                 AudioPlayUtils.getInstance().playLocalAudio(MusicActivity.this,
                         musicList.get(currentMusicPosition));
             }
@@ -162,8 +179,9 @@ public class MusicActivity extends AppCompatActivity {
                     Toast.makeText(MusicActivity.this, "后面没有音乐了", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                currentMusicPosition++;
+                currentMusicPosition=currentMusicPosition+1;
                 musicName.setText(musicList.get(currentMusicPosition));
+
                 AudioPlayUtils.getInstance().playLocalAudio(MusicActivity.this,
                         musicList.get(currentMusicPosition));
             }
@@ -180,7 +198,7 @@ public class MusicActivity extends AppCompatActivity {
             }
         });
 
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        musicPlayProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 Log.e("seek", "onProgressChanged");
@@ -226,26 +244,36 @@ public class MusicActivity extends AppCompatActivity {
     public void showMusicListDialog() {
         if (bottomSheetDialog == null) {
             bottomSheetDialog = new BottomSheetDialog(this);
+
             View view = LayoutInflater.from(this).inflate(R.layout.dialog_music_list, null, false);
             recycler_music = view.findViewById(R.id.recycler_music);
             initMusicRecycler();
+
+            //设置 弹窗 展示 内容
             bottomSheetDialog.setContentView(view);
         }
+        //展示 弹窗
         bottomSheetDialog.show();
     }
 
     private void initMusicRecycler() {
+        //设置 recyclerView的布局管理
         recycler_music.setLayoutManager(new LinearLayoutManager(this));
+
         MusicAdapter adapter = new MusicAdapter(musicList, new MusicAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
+
                 currentMusicPosition = position;
                 musicName.setText(musicList.get(currentMusicPosition));
+
                 AudioPlayUtils.getInstance().playLocalAudio(MusicActivity.this,
                         musicList.get(currentMusicPosition));
+
                 bottomSheetDialog.dismiss();
             }
         });
+
         recycler_music.setAdapter(adapter);
     }
 }

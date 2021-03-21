@@ -12,7 +12,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -50,29 +49,6 @@ public class AudioPlayUtils implements LifecycleObserver {
         new Handler(Looper.getMainLooper()).post(() -> fragmentActivity.getLifecycle().addObserver(AudioPlayUtils.this));
     }
 
-    public void playNetAudio(Context context, String url) {
-        if (mediaPlayer == null) {
-            mediaPlayer = new MediaPlayer();
-        }
-        log("playNetAudio url=" + url);
-        if (mediaPlayer.isPlaying()) {
-            log("正在播放中");
-            return;
-        }
-        try {
-            //fix：网络播放方法
-            mediaPlayer.setDataSource(url);
-        } catch (Exception e) {
-            e.printStackTrace();
-            log("onError  at setDataSource");
-            if (onMediaPlayListener != null) {
-                onMediaPlayListener.onError(e);
-            }
-            return;
-        }
-        play();
-    }
-
     public boolean isPlay() {
         if (mediaPlayer == null) {
             return false;
@@ -95,19 +71,22 @@ public class AudioPlayUtils implements LifecycleObserver {
         }
     }
 
-    public void seekTo(int duration){
+    public void seekTo(int duration) {
         if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
             mediaPlayer.seekTo(duration);
         }
     }
 
-    public void playLocalAudio(Context context,String musicName) {
+    public void playLocalAudio(Context context, String musicName) {
         if (mediaPlayer == null) {
             mediaPlayer = new MediaPlayer();
         }
+        //判断 当前 播放状态
         if (mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
-                mediaPlayer.reset();
+            //停止 当前音乐
+            mediaPlayer.stop();
+            //重置 播放器
+            mediaPlayer.reset();
         }
         //获得播放源访问入口
         AssetManager am = context.getAssets();
@@ -121,17 +100,22 @@ public class AudioPlayUtils implements LifecycleObserver {
                 onMediaPlayListener.onError(e);
             }
         }
+        //开始 播放
         play();
     }
 
     private void play() {
+        //准备
         mediaPlayer.prepareAsync();
-        mediaPlayer.setOnPreparedListener(mp -> {
-            log("onPrepared");
-            if (onMediaPlayListener != null) {
-                onMediaPlayListener.onPrepared(mp.getDuration());
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                log("onPrepared");
+                if (onMediaPlayListener != null) {
+                    onMediaPlayListener.onPrepared(mp.getDuration());
+                }
+                start();
             }
-            start();
         });
         mediaPlayer.setOnErrorListener((mp, what, extra) -> {
             //返回true表示在此处理错误，不会回调onCompletion
@@ -163,13 +147,13 @@ public class AudioPlayUtils implements LifecycleObserver {
         if (mTimer == null) {
             mTimer = new Timer();
         }
-        log("timer  start"+System.currentTimeMillis());
+        log("timer  start" + System.currentTimeMillis());
         mTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 new Handler(Looper.getMainLooper()).post(() -> {
                     if (onMediaPlayListener != null && mediaPlayer != null) {
-                        log("timer  schedule"+System.currentTimeMillis()+"    "+mediaPlayer.getCurrentPosition());
+                        log("timer  schedule" + System.currentTimeMillis() + "    " + mediaPlayer.getCurrentPosition());
                         onMediaPlayListener.onPlay(mediaPlayer.getCurrentPosition());
                     }
                 });
@@ -183,7 +167,7 @@ public class AudioPlayUtils implements LifecycleObserver {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
             mTimer.cancel();
-            mTimer=null;
+            mTimer = null;
             if (onMediaPlayListener != null) {
                 onMediaPlayListener.onPause();
             }

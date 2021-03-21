@@ -13,9 +13,7 @@ import com.iflytek.cloud.SpeechUtility;
 public class SpeechApplication extends Application {
     @Override
     public void onCreate() {
-        String param = "appid=601663eb," +
-                // 设置使用v5+
-                SpeechConstant.ENGINE_MODE + "=" + SpeechConstant.MODE_MSC;
+        String param = "appid=601663eb," + SpeechConstant.ENGINE_MODE + "=" + SpeechConstant.MODE_MSC;
         SpeechUtility.createUtility(SpeechApplication.this, param);
         super.onCreate();
         Log.e("SpeechApplication","onCreate");

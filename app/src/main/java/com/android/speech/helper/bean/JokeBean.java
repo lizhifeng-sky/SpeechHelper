@@ -7,6 +7,9 @@ package com.android.speech.helper.bean;
 public class JokeBean {
 
     private String content;
+
+
+
     private String hashId;
     private long unixtime;
     private String updatetime;
