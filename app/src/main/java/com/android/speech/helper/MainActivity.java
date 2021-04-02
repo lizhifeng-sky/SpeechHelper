@@ -11,6 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.android.speech.helper.aiui.AIUIWrapper;
+import com.android.speech.helper.aiui.CustomAIUIWrapper;
 import com.android.speech.helper.utils.IntentUtils;
 import com.android.speech.helper.utils.JokeUtils;
 import com.android.speech.helper.utils.MusicUtils;
@@ -62,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
 
     //是否正在说话
     private boolean isSpeaking = false;
+    private CustomAIUIWrapper aiuiWrapper;
 
 
     @Override
@@ -94,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
         //启动 播放动画
         animatorView.playAnimation();
 
+
+        aiuiWrapper=new CustomAIUIWrapper(this);
         //设置 按钮 的 点击事件
         setOnClickListener();
 
@@ -199,7 +204,8 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
             }
             animatorView.setAnimation(R.raw.joke);
             animatorView.playAnimation();
-            JokeUtils.speakJoke(this);
+//            JokeUtils.speakJoke(this);
+            aiuiWrapper.sendMessage("讲个笑话");
         });
 
         //地图 导航
@@ -261,7 +267,8 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
                 }
 
                 //进行 意图识别 处理
-                IntentUtils.intent(MainActivity.this, text, MainActivity.this);
+//                IntentUtils.intent(MainActivity.this, text, MainActivity.this);
+                aiuiWrapper.sendMessage(text);
             }
 
             @Override

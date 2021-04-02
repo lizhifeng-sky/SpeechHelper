@@ -1,3 +1,4 @@
+include ':aiui'
 include ':mscV5PlusDemo'
 //include ':moudle_speech'
 include ':app'

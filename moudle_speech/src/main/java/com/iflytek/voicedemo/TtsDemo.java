@@ -235,7 +235,7 @@ public class TtsDemo extends Activity implements OnClickListener {
         public void onBufferProgress(int percent, int beginPos, int endPos,
                                      String info) {
             // 合成进度
-            Log.e("MscSpeechLog_", "percent =" + percent);
+//            Log.e("MscSpeechLog_", "percent =" + percent);
             mPercentForBuffering = percent;
             showTip(String.format(getString(R.string.tts_toast_format),
                     mPercentForBuffering, mPercentForPlaying));
@@ -244,7 +244,7 @@ public class TtsDemo extends Activity implements OnClickListener {
         @Override
         public void onSpeakProgress(int percent, int beginPos, int endPos) {
             // 播放进度
-            Log.e("MscSpeechLog_", "percent =" + percent);
+//            Log.e("MscSpeechLog_", "percent =" + percent);
             mPercentForPlaying = percent;
             showTip(String.format(getString(R.string.tts_toast_format),
                     mPercentForBuffering, mPercentForPlaying));
@@ -288,7 +288,7 @@ public class TtsDemo extends Activity implements OnClickListener {
             //当设置SpeechConstant.TTS_DATA_NOTIFY为1时，抛出buf数据
             if (SpeechEvent.EVENT_TTS_BUFFER == eventType) {
                 byte[] buf = obj.getByteArray(SpeechEvent.KEY_EVENT_TTS_BUFFER);
-                Log.e("MscSpeechLog_", "bufis =" + buf.length);
+//                Log.e("MscSpeechLog_", "bufis =" + buf.length);
                 container.add(buf);
             }
 
@@ -372,7 +372,7 @@ public class TtsDemo extends Activity implements OnClickListener {
         }
         try {
             if (memFile == null) {
-                Log.e("MscSpeechLog_", "ffffffffff");
+//                Log.e("MscSpeechLog_", "ffffffffff");
                 String mFilepath = Environment.getExternalStorageDirectory() + "/1.pcm";
                 memFile = new MemoryFile(mFilepath, 1920000);
                 memFile.allowPurging(false);
