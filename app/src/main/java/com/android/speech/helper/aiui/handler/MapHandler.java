@@ -11,6 +11,7 @@ import com.android.speech.helper.aiui.model.Answer;
 import com.android.speech.helper.aiui.model.SemanticResult;
 import com.android.speech.helper.bean.aiui.JsonRootBean;
 import com.android.speech.helper.bean.aiui.Slots;
+import com.android.speech.helper.utils.GsonUtils;
 
 import org.json.JSONArray;
 
@@ -40,7 +41,8 @@ public class MapHandler extends IntentHandler {
         return new Answer(result.answer);
     }
 
-    public Answer dealMapIntent(JsonRootBean result) {
+    public Answer dealMapIntent(String json) {
+        JsonRootBean result= GsonUtils.fromJson(json,JsonRootBean.class);
         switch (result.semantic.get(0).getIntent()) {
             case "LOCATE": {
                 String location = optSlotValue(result, "endLoc.ori_loc");

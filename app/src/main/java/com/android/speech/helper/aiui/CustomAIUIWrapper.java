@@ -5,11 +5,15 @@ import android.content.res.AssetManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.android.speech.helper.MusicActivity;
 import com.android.speech.helper.aiui.handler.ChatMessageHandler;
 import com.android.speech.helper.aiui.handler.MapHandler;
 import com.android.speech.helper.aiui.model.RawMessage;
 import com.android.speech.helper.aiui.model.SemanticResult;
+import com.android.speech.helper.bean.aiui.JsonMessageBean;
 import com.android.speech.helper.bean.aiui.JsonRootBean;
+import com.android.speech.helper.bean.aiui.JsonSimpleBean;
+import com.android.speech.helper.utils.AlarmUtils;
 import com.android.speech.helper.utils.ContactUtils;
 import com.android.speech.helper.utils.GsonUtils;
 import com.iflytek.SpeakHelper;
@@ -18,12 +22,15 @@ import com.iflytek.aiui.AIUIConstant;
 import com.iflytek.aiui.AIUIEvent;
 import com.iflytek.aiui.AIUIListener;
 import com.iflytek.aiui.AIUIMessage;
+import com.iflytek.aiui.AIUISetting;
+import com.iflytek.aiui.jni.AIUI;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -66,36 +73,45 @@ public class CustomAIUIWrapper {
                             if ("nlp".equals(sub)) {
                                 // 解析得到语义结果
                                 String resultStr = cntJson.optString("intent");
-                                JsonRootBean rootBean = GsonUtils.fromJson(resultStr, JsonRootBean.class);
+                                JsonSimpleBean rootBean = GsonUtils.fromJson(resultStr, JsonSimpleBean.class);
                                 Log.e(TAG, rootBean.getService());
-                                if (rootBean.getService().equals("joke")){
+                                if (rootBean.getService().equals("joke")) {
                                     //joke 内容
                                     Log.e(TAG, rootBean.getAnswer().getText());
-                                }else if (rootBean.getService().equals("weather")){
+                                } else if (rootBean.getService().equals("weather")) {
                                     //weather 内容
                                     Log.e(TAG, rootBean.getAnswer().getText());
-                                }else if (rootBean.getService().equals("mapU")){
+                                } else if (rootBean.getService().equals("mapU")) {
                                     //地图 内容
                                     MapHandler mapHandler = new MapHandler(context);
-                                    mapHandler.dealMapIntent(rootBean);
-                                }else if (rootBean.getService().equals("iFlytekQA")
-                                    ||rootBean.getService().equals("message")){
+                                    mapHandler.dealMapIntent(resultStr);
+                                } else if (rootBean.getService().equals("iFlytekQA")
+                                        || rootBean.getService().equals("message")) {
                                     //发短信
                                     //打电话
                                     //说话内容
                                     //rootBean.getText()
-                                    String mobile = rootBean.getText().substring(1, 12);
+                                    JsonMessageBean jsonMessageBean=GsonUtils.fromJson(resultStr,JsonMessageBean.class);
+                                    sendMessage(new AIUIMessage(AIUIConstant.CMD_CLEAN_DIALOG_HISTORY, 0, 0, null, null));
                                     try {
-                                        if (rootBean.getText().contains("打电话")) {
-                                            ContactUtils.callPhone(context, mobile);
+                                        if (!rootBean.getAnswer().getText().contains("短信")) {
+                                            ContactUtils.callPhone(context, jsonMessageBean.getText().substring(1,12));
                                         } else {
-                                            ContactUtils.sendSMS(context, mobile);
+                                            ContactUtils.sendSMS(context, jsonMessageBean.getSemantic().get(0).getSlots().get(0).getValue());
                                         }
                                     } catch (Exception e) {
                                         SpeakHelper.getInstance().startSpeak("小麦需要完整的手机号呢", null);
                                     }
-                                }else if (rootBean.getService().equals("scheduleX")){
+                                } else if (rootBean.getService().equals("scheduleX")) {
                                     //提醒事件
+                                    Log.e(TAG, rootBean.getAnswer().getText());
+                                    JsonMessageBean jsonMessageBean=GsonUtils.fromJson(resultStr,JsonMessageBean.class);
+                                    sendMessage(new AIUIMessage(AIUIConstant.CMD_CLEAN_DIALOG_HISTORY, 0, 0, null, null));
+                                    String action=jsonMessageBean.semantic.get(0).getSlots().get(0).getValue();
+                                    String time=jsonMessageBean.semantic.get(0).getSlots().get(1).getValue();
+                                    AlarmUtils.matchAlarm(context,time,action);
+                                } else if (rootBean.getService().equals("musicPlayer_smartHome")) {
+                                    MusicActivity.start(context, "");
                                 }
                             }
                         }
@@ -145,6 +161,9 @@ public class CustomAIUIWrapper {
                     }
                 }
                 break;
+                case AIUIConstant.CMD_TTS:
+                    Log.e("cmd_tts", event.info);
+                    break;
 
                 default:
                     break;
@@ -157,7 +176,6 @@ public class CustomAIUIWrapper {
         //创建AIUIAgent
         this.context = context;
         mAgent = AIUIAgent.createAgent(context, getAIUIParams(), mAIUIListener);
-
     }
 
     private String getAIUIParams() {
@@ -178,7 +196,11 @@ public class CustomAIUIWrapper {
 
     public void sendMessage(String text) {
         //pers_param用于启用动态实体和所见即可说功能
-        String params = "data_type=text,pers_param={\"appid\":\"\",\"uid\":\"\"}";
+        String voice = "vcn=xunfeixiaojuan" +  //合成发音人
+                ",speed=50" +  //合成速度
+                ",pitch=50" +  //合成音调
+                ",volume=50";//构建合成参数
+        String params = "data_type=text,pers_param={\"appid\":\"\",\"uid\":\"\"}" + "," + voice;
         sendMessage(new AIUIMessage(AIUIConstant.CMD_WRITE, 0, 0,
                 params, text.getBytes()));
     }
@@ -191,6 +213,25 @@ public class CustomAIUIWrapper {
             }
             mAgent.sendMessage(message);
         }
+    }
+
+    public void sendCustomMessage(String content) {
+        byte[] ttsData;  //转为二进制数据
+        try {
+            ttsData = content.getBytes("utf-8");
+
+            //开始合成
+            String params = "vcn=xunfeixiaojuan" +  //合成发音人
+                    ",speed=50" +  //合成速度
+                    ",pitch=50" +  //合成音调
+                    ",volume=50";//构建合成参数
+//合成音量
+            AIUIMessage startTts = new AIUIMessage(AIUIConstant.CMD_TTS, AIUIConstant.START, 0, params, ttsData);
+            mAgent.sendMessage(startTts);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**

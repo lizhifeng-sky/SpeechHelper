@@ -25,36 +25,20 @@ import static android.provider.CalendarContract.ACCOUNT_TYPE_LOCAL;
 public class AlarmUtils {
     //添加闹钟
 
-    public static boolean matchAlarm(Context context, String text) {
-        if (text.contains("提醒我")) {
+    public static boolean matchAlarm(Context context, String time,String action) {
             int day;
-            if (text.contains("今天")) {
+            if (time.contains("今天")) {
                 day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-            } else if (text.contains("明天")) {
-                int time = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-                day = (time + 1) % 7;
+            } else if (time.contains("明天")) {
+                int tims = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+                day = (tims + 1) % 7;
             } else {
                 return false;
             }
-            int hour;
-            if (text.contains("中午")) {
-                hour = 12;
-            } else if (text.contains("下午")) {
-                hour = 16;
-            } else if (text.contains("晚上")) {
-                hour = 20;
-            } else if (text.contains("上午")) {
-                hour = 10;
-            } else if (text.contains("早上")) {
-                hour = 6;
-            } else {
-                return false;
-            }
-            createAlarm(context, day, text.split("提醒我")[1], hour, 0);
+        String substring = time.substring(4);
+        String replace = substring.replace("点", "");
+        createAlarm(context, day,action, Integer.parseInt(replace), 0);
             return true;
-        } else {
-            return false;
-        }
     }
 
     //提醒我 （周一至周日）（早上/上午/下午/晚上）（0-23）点（事件描述）

@@ -21,6 +21,7 @@ import com.iflytek.OnSpeechInitListener;
 import com.iflytek.OnWakeUpListener;
 import com.iflytek.SimpleSpeakListenerImpl;
 import com.iflytek.SimpleSpeechListenerImpl;
+//import com.iflytek.SpeakHelper;
 import com.iflytek.SpeakHelper;
 import com.iflytek.SpeechHelper;
 import com.iflytek.WakeHelper;
@@ -126,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
                         lastWakeTime = System.currentTimeMillis();
                         isSpeaking = true;
                         robot_message.setText("我在,有什么可以帮助你的嘛");
+//                        aiuiWrapper.sendCustomMessage("我在,有什么可以帮助你的嘛？");
                         SpeakHelper.getInstance().startSpeak("我在,有什么可以帮助你的嘛？",
                                 new SimpleSpeakListenerImpl() {
                                     @Override
@@ -163,11 +165,13 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
                 //初始化 语音播放
                 SpeakHelper.getInstance().initSpeak(MainActivity.this);
                 SpeakHelper.getInstance().startSpeak("初始化成功", new SimpleSpeakListenerImpl());
+//                aiuiWrapper.sendCustomMessage("初始化成功");
             }
 
             @Override
             public void initFail(int code) {
                 Toast.makeText(MainActivity.this, "初始化失败", Toast.LENGTH_SHORT).show();
+                aiuiWrapper.sendCustomMessage("初始化失败");
                 Log.e("prepare", "initFail");
                 isSpeechInitSuccess = false;
             }
@@ -188,14 +192,15 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
                 Toast.makeText(MainActivity.this, "初始化失败", Toast.LENGTH_SHORT).show();
                 return;
             }
-            SpeakHelper.getInstance().startSpeak("小麦在呢，有什么可以帮助你的嘛？",
-                    new SimpleSpeakListenerImpl() {
-                        @Override
-                        public void onCompleted(SpeechError speechError) {
-                            isSpeaking = false;
-                            startSpeech();
-                        }
-                    });
+            aiuiWrapper.sendCustomMessage("小麦在呢，有什么可以帮助你的嘛？");
+//            SpeakHelper.getInstance().startSpeak("小麦在呢，有什么可以帮助你的嘛？",
+//                    new SimpleSpeakListenerImpl() {
+//                        @Override
+//                        public void onCompleted(SpeechError speechError) {
+//                            isSpeaking = false;
+//                            startSpeech();
+//                        }
+//                    });
         });
         //笑话按钮 点击
         emoji.setOnClickListener(v -> {
@@ -216,7 +221,8 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
             animatorView.setAnimation(R.raw.animator_0);
             animatorView.playAnimation();
             robot_message.setText("你可以说：带我去 人民广场");
-            SpeakHelper.getInstance().startSpeak("你可以说：带我去 人民广场", this);
+            aiuiWrapper.sendCustomMessage("你可以说：带我去 人民广场");
+//            SpeakHelper.getInstance().startSpeak("你可以说：带我去 人民广场", this);
         });
 
         //音乐播放
@@ -238,7 +244,8 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
             animatorView.setAnimation(R.raw.animator_0);
             animatorView.playAnimation();
             robot_message.setText("你可以说：给某个手机号发短信");
-            SpeakHelper.getInstance().startSpeak("你可以说：给某个手机号发短信", this);
+            aiuiWrapper.sendCustomMessage("你可以说：给某个手机号发短信");
+//            SpeakHelper.getInstance().startSpeak("你可以说：给某个手机号发短信", this);
         });
 
         phone.setOnClickListener(v -> {
@@ -248,7 +255,8 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
             animatorView.setAnimation(R.raw.animator_0);
             animatorView.playAnimation();
             robot_message.setText("你可以说：给某个手机号打电话");
-            SpeakHelper.getInstance().startSpeak("你可以说：给某个手机号打电话", this);
+            aiuiWrapper.sendCustomMessage("你可以说：给某个手机号打电话");
+//            SpeakHelper.getInstance().startSpeak("你可以说：给某个手机号打电话", this);
         });
     }
 

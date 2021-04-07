@@ -45,12 +45,12 @@ public class IntentUtils {
 
         } else if (text.contains("提醒")) {
             //日程
-            boolean b = AlarmUtils.matchAlarm(context, text);
-            if (b) {
-                SpeakHelper.getInstance().startSpeak("好的", onSpeakListener);
-            } else {
-                SpeakHelper.getInstance().startSpeak("小麦没听懂你的意思呢，你可以说 明天中午提醒我做美发", onSpeakListener);
-            }
+//            boolean b = AlarmUtils.matchAlarm(context, text);
+//            if (b) {
+//                SpeakHelper.getInstance().startSpeak("好的", onSpeakListener);
+//            } else {
+//                SpeakHelper.getInstance().startSpeak("小麦没听懂你的意思呢，你可以说 明天中午提醒我做美发", onSpeakListener);
+//            }
 
         } else if (text.contains("给") && (text.contains("打电话") | text.contains("发短信"))) {
             String mobile = text.substring(1, 12);

@@ -1,7 +1,5 @@
 package com.android.speech.helper.bean.aiui;
 
-import org.json.JSONObject;
-
 import java.util.List;
 
 /**
@@ -10,7 +8,7 @@ import java.util.List;
  * @author bejson.com (i@bejson.com)
  * @website http://www.bejson.com/java2pojo/
  */
-public class JsonRootBean {
+public class JsonMessageBean {
 
     private Answer answer;
     private String category;

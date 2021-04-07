@@ -34,7 +34,6 @@ public class MusicActivity extends AppCompatActivity {
     private SeekBar musicPlayProgress;
 
 
-
     private ImageView comeBack;
 
     private ImageView before;
@@ -42,8 +41,6 @@ public class MusicActivity extends AppCompatActivity {
     private ImageView next;
 
     private ImageView menu;
-
-
 
 
     private List<String> musicList;
@@ -89,7 +86,8 @@ public class MusicActivity extends AppCompatActivity {
 
     private void startPlay() {
         //key-value
-        if (getIntent().getStringExtra("name") == null) {
+        if (getIntent().getStringExtra("name") == null ||
+                getIntent().getStringExtra("name").isEmpty()) {
             currentMusicName = musicList.get((int) (System.currentTimeMillis() % 14));
         } else {
             currentMusicName = getIntent().getStringExtra("name");
@@ -164,7 +162,7 @@ public class MusicActivity extends AppCompatActivity {
                     Toast.makeText(MusicActivity.this, "前面没有音乐了", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                currentMusicPosition=currentMusicPosition-1;
+                currentMusicPosition = currentMusicPosition - 1;
                 musicName.setText(musicList.get(currentMusicPosition));
 
                 AudioPlayUtils.getInstance().playLocalAudio(MusicActivity.this,
@@ -179,7 +177,7 @@ public class MusicActivity extends AppCompatActivity {
                     Toast.makeText(MusicActivity.this, "后面没有音乐了", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                currentMusicPosition=currentMusicPosition+1;
+                currentMusicPosition = currentMusicPosition + 1;
                 musicName.setText(musicList.get(currentMusicPosition));
 
                 AudioPlayUtils.getInstance().playLocalAudio(MusicActivity.this,
