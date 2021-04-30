@@ -9,9 +9,7 @@ import com.android.speech.helper.MusicActivity;
 import com.android.speech.helper.aiui.handler.ChatMessageHandler;
 import com.android.speech.helper.aiui.handler.MapHandler;
 import com.android.speech.helper.aiui.model.RawMessage;
-import com.android.speech.helper.aiui.model.SemanticResult;
 import com.android.speech.helper.bean.aiui.JsonMessageBean;
-import com.android.speech.helper.bean.aiui.JsonRootBean;
 import com.android.speech.helper.bean.aiui.JsonSimpleBean;
 import com.android.speech.helper.utils.AlarmUtils;
 import com.android.speech.helper.utils.ContactUtils;
@@ -22,8 +20,6 @@ import com.iflytek.aiui.AIUIConstant;
 import com.iflytek.aiui.AIUIEvent;
 import com.iflytek.aiui.AIUIListener;
 import com.iflytek.aiui.AIUIMessage;
-import com.iflytek.aiui.AIUISetting;
-import com.iflytek.aiui.jni.AIUI;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,15 +27,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 public class CustomAIUIWrapper {
     private static final String TAG = "CustomAIUIWrapper";
@@ -91,11 +80,11 @@ public class CustomAIUIWrapper {
                                     //打电话
                                     //说话内容
                                     //rootBean.getText()
-                                    JsonMessageBean jsonMessageBean=GsonUtils.fromJson(resultStr,JsonMessageBean.class);
+                                    JsonMessageBean jsonMessageBean = GsonUtils.fromJson(resultStr, JsonMessageBean.class);
                                     sendMessage(new AIUIMessage(AIUIConstant.CMD_CLEAN_DIALOG_HISTORY, 0, 0, null, null));
                                     try {
                                         if (!rootBean.getAnswer().getText().contains("短信")) {
-                                            ContactUtils.callPhone(context, jsonMessageBean.getText().substring(1,12));
+                                            ContactUtils.callPhone(context, jsonMessageBean.getText().substring(1, 12));
                                         } else {
                                             ContactUtils.sendSMS(context, jsonMessageBean.getSemantic().get(0).getSlots().get(0).getValue());
                                         }
@@ -105,12 +94,13 @@ public class CustomAIUIWrapper {
                                 } else if (rootBean.getService().equals("scheduleX")) {
                                     //提醒事件
                                     Log.e(TAG, rootBean.getAnswer().getText());
-                                    JsonMessageBean jsonMessageBean=GsonUtils.fromJson(resultStr,JsonMessageBean.class);
+                                    JsonMessageBean jsonMessageBean = GsonUtils.fromJson(resultStr, JsonMessageBean.class);
                                     sendMessage(new AIUIMessage(AIUIConstant.CMD_CLEAN_DIALOG_HISTORY, 0, 0, null, null));
-                                    String action=jsonMessageBean.semantic.get(0).getSlots().get(0).getValue();
-                                    String time=jsonMessageBean.semantic.get(0).getSlots().get(1).getValue();
-                                    AlarmUtils.matchAlarm(context,time,action);
+                                    String action = jsonMessageBean.semantic.get(0).getSlots().get(0).getValue();
+                                    String time = jsonMessageBean.semantic.get(0).getSlots().get(1).getValue();
+                                    AlarmUtils.matchAlarm(context, time, action);
                                 } else if (rootBean.getService().equals("musicPlayer_smartHome")) {
+                                    stop();
                                     MusicActivity.start(context, "");
                                 }
                             }
@@ -195,6 +185,7 @@ public class CustomAIUIWrapper {
     }
 
     public void sendMessage(String text) {
+        stop();
         //pers_param用于启用动态实体和所见即可说功能
         String voice = "vcn=xunfeixiaojuan" +  //合成发音人
                 ",speed=50" +  //合成速度
@@ -212,6 +203,13 @@ public class CustomAIUIWrapper {
                 mAgent.sendMessage(new AIUIMessage(AIUIConstant.CMD_WAKEUP, 0, 0, "", null));
             }
             mAgent.sendMessage(message);
+        }
+    }
+
+    //
+    public void stop() {
+        if (mAgent != null) {
+            mAgent.sendMessage(new AIUIMessage(AIUIConstant.CMD_STOP, 0, 0, "", null));
         }
     }
 
