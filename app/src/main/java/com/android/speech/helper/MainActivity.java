@@ -11,23 +11,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.android.speech.helper.aiui.AIUIWrapper;
 import com.android.speech.helper.aiui.CustomAIUIWrapper;
-import com.android.speech.helper.utils.IntentUtils;
-import com.android.speech.helper.utils.JokeUtils;
 import com.android.speech.helper.utils.MusicUtils;
 import com.iflytek.OnSpeakListener;
 import com.iflytek.OnSpeechInitListener;
 import com.iflytek.OnWakeUpListener;
 import com.iflytek.SimpleSpeakListenerImpl;
 import com.iflytek.SimpleSpeechListenerImpl;
-//import com.iflytek.SpeakHelper;
 import com.iflytek.SpeakHelper;
 import com.iflytek.SpeechHelper;
 import com.iflytek.WakeHelper;
 import com.iflytek.cloud.SpeechError;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+//import com.iflytek.SpeakHelper;
 
 public class MainActivity extends AppCompatActivity implements OnSpeakListener {
 
@@ -67,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
     private boolean isSpeaking = false;
     private CustomAIUIWrapper aiuiWrapper;
 
+    private long lastIntentTime=0L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
         animatorView.playAnimation();
 
 
-        aiuiWrapper=new CustomAIUIWrapper(this);
+        aiuiWrapper = new CustomAIUIWrapper(this);
         //设置 按钮 的 点击事件
         setOnClickListener();
 
@@ -265,7 +264,11 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
         SpeechHelper.getInstance().start(new SimpleSpeechListenerImpl() {
             @Override
             public void onResult(String originalText, String text) {
-
+                if (System.currentTimeMillis()-lastIntentTime<2500){
+                    return;
+                }
+                lastIntentTime=System.currentTimeMillis();
+                Log.e("originalText",originalText+"    "+text);
                 if (text.contains("笑话")) {
                     animatorView.setAnimation(R.raw.joke);
                     animatorView.playAnimation();
@@ -276,7 +279,12 @@ public class MainActivity extends AppCompatActivity implements OnSpeakListener {
 
                 //进行 意图识别 处理
 //                IntentUtils.intent(MainActivity.this, text, MainActivity.this);
-                aiuiWrapper.sendMessage(text);
+                String matchMusic = MusicUtils.matchMusic(text);
+                if (matchMusic != null) {
+                    MusicActivity.start(MainActivity.this, matchMusic);
+                } else {
+                    aiuiWrapper.sendMessage(text);
+                }
             }
 
             @Override

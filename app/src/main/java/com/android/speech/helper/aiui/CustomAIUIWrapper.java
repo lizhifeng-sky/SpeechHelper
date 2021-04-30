@@ -42,10 +42,6 @@ public class CustomAIUIWrapper {
         @Override
         public void onEvent(AIUIEvent event) {
             switch (event.eventType) {
-                case AIUIConstant.EVENT_WAKEUP:
-                    //唤醒事件
-                    Log.i(TAG, "on event: " + event.eventType);
-                    break;
 
                 case AIUIConstant.EVENT_RESULT: {
                     //结果解析事件
@@ -72,6 +68,7 @@ public class CustomAIUIWrapper {
                                     Log.e(TAG, rootBean.getAnswer().getText());
                                 } else if (rootBean.getService().equals("mapU")) {
                                     //地图 内容
+                                    //科大讯飞处理
                                     MapHandler mapHandler = new MapHandler(context);
                                     mapHandler.dealMapIntent(resultStr);
                                 } else if (rootBean.getService().equals("iFlytekQA")
@@ -110,13 +107,26 @@ public class CustomAIUIWrapper {
                 }
                 break;
 
+
+
+
+
+
+
+
+
+
+
+                case AIUIConstant.EVENT_WAKEUP:
+                    //唤醒事件
+                    Log.i(TAG, "on event: " + event.eventType);
+                    break;
                 case AIUIConstant.EVENT_ERROR: {
                     //错误事件
                     Log.i(TAG, "on event: " + event.eventType);
                     Log.e(TAG, "错误: " + event.arg1 + "\n" + event.info);
                 }
                 break;
-
                 case AIUIConstant.EVENT_VAD: {
                     if (AIUIConstant.VAD_BOS == event.arg1) {
                         //语音前端点
@@ -125,7 +135,6 @@ public class CustomAIUIWrapper {
                     }
                 }
                 break;
-
                 case AIUIConstant.EVENT_START_RECORD: {
                     Log.i(TAG, "on event: " + event.eventType);
                     //开始录音
@@ -137,7 +146,6 @@ public class CustomAIUIWrapper {
                     // 停止录音
                 }
                 break;
-
                 case AIUIConstant.EVENT_STATE: {
                     // 状态事件
                     mAIUIState = event.arg1;
@@ -153,7 +161,9 @@ public class CustomAIUIWrapper {
                 case AIUIConstant.CMD_TTS:
                     Log.e("cmd_tts", event.info);
                     break;
-
+                case AIUIConstant.TTS_SPEAK_COMPLETED:
+                    Log.e("TTS_SPEAK_COMPLETED", "event.info");
+                    break;
                 default:
                     break;
             }
@@ -184,7 +194,6 @@ public class CustomAIUIWrapper {
     }
 
     public void sendMessage(String text) {
-        stop();
         //pers_param用于启用动态实体和所见即可说功能
         String voice = "vcn=xunfeixiaojuan" +  //合成发音人
                 ",speed=50" +  //合成速度
@@ -205,13 +214,6 @@ public class CustomAIUIWrapper {
         }
     }
 
-    //
-    public void stop() {
-        if (mAgent != null) {
-            mAgent.sendMessage(new AIUIMessage(AIUIConstant.CMD_STOP, 0, 0, "", null));
-        }
-    }
-
     public void sendCustomMessage(String content) {
         byte[] ttsData;  //转为二进制数据
         try {
@@ -229,6 +231,31 @@ public class CustomAIUIWrapper {
             e.printStackTrace();
         }
 
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //
+    public void completed() {
+        //login
+        // userName password
+        // 1、userName password
+        if (mAgent != null) {
+            mAgent.sendMessage(new AIUIMessage(AIUIConstant.TTS_SPEAK_COMPLETED, 0, 0, "", null));
+        }
     }
 
     /**
