@@ -100,7 +100,6 @@ public class CustomAIUIWrapper {
                                     String time = jsonMessageBean.semantic.get(0).getSlots().get(1).getValue();
                                     AlarmUtils.matchAlarm(context, time, action);
                                 } else if (rootBean.getService().equals("musicPlayer_smartHome")) {
-                                    stop();
                                     MusicActivity.start(context, "");
                                 }
                             }
