@@ -86,7 +86,7 @@ public class CustomAIUIWrapper {
                                             ContactUtils.sendSMS(context, jsonMessageBean.getSemantic().get(0).getSlots().get(0).getValue());
                                         }
                                     } catch (Exception e) {
-                                        SpeakHelper.getInstance().startSpeak("小麦需要完整的手机号呢", null);
+//                                        SpeakHelper.getInstance().startSpeak("小麦需要完整的手机号呢", null);
                                     }
                                 } else if (rootBean.getService().equals("scheduleX")) {
                                     //提醒事件
